@@ -24,7 +24,7 @@ use Config;
 require Exporter;
 @ISA = qw(Exporter);
 
-$VERSION = do { my @r = '$Snapshot: /IPC-SysV/1.99_04 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
+$VERSION = do { my @r = '$Snapshot: /IPC-SysV/1.99_05 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
 $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 

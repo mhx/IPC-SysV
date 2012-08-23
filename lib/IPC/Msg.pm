@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 16 $
+#  $Revision: 17 $
 #  $Author: mhx $
-#  $Date: 2007/10/14 04:15:26 +0100 $
+#  $Date: 2007/10/15 19:29:06 +0100 $
 #
 ################################################################################
 #
@@ -21,7 +21,7 @@ use strict;
 use vars qw($VERSION);
 use Carp;
 
-$VERSION = do { my @r = '$Snapshot: /IPC-SysV/1.99_04 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
+$VERSION = do { my @r = '$Snapshot: /IPC-SysV/1.99_05 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
 $VERSION = eval $VERSION;
 
 # Figure out if we have support for native sized types
@@ -128,7 +128,7 @@ IPC::Msg - SysV Msg IPC object class
     use IPC::SysV qw(IPC_PRIVATE S_IRUSR S_IWUSR);
     use IPC::Msg;
 
-    $msg = new IPC::Msg(IPC_PRIVATE, S_IRUSR | S_IWUSR);
+    $msg = IPC::Msg->new(IPC_PRIVATE, S_IRUSR | S_IWUSR);
 
     $msg->snd(pack("l! a*",$msgtype,$msg));
 

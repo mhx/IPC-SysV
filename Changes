@@ -1,3 +1,10 @@
+1.99_05 - 2007-10-18
+
+    * make sure we can build even without ExtUtils::Constant
+      installed and messed up dependencies
+    * avoid indirect notation in docs
+    * cannot do arithmetics on void pointers
+
 1.99_04 - 2007-10-14
 
     * add documentation for IPC::SharedMem

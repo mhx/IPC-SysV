@@ -1,8 +1,8 @@
 /*******************************************************************************
 *
-*  $Revision: 27 $
+*  $Revision: 30 $
 *  $Author: mhx $
-*  $Date: 2007/10/13 16:06:31 +0100 $
+*  $Date: 2007/10/18 18:57:29 +0100 $
 *
 ********************************************************************************
 *
@@ -18,7 +18,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#define NEED_newCONSTSUB
 #define NEED_sv_2pv_flags
 #define NEED_sv_pvn_force_flags
 #include "ppport.h"
@@ -84,6 +83,15 @@
 #define AV_STORE_IV(ident, av, index)                         \
           av_store((av), (index), newSViv(ident))
 
+static const char *s_fmt_not_isa = "Method %s not called a %s object";
+static const char *s_bad_length = "Bad arg length for %s, length is %d, should be %d";
+static const char *s_sysv_unimpl PERL_UNUSED_DECL
+                                 = "System V %sxxx is not implemented on this machine";
+
+static const char *s_pkg_msg = "IPC::Msg::stat";
+static const char *s_pkg_sem = "IPC::Semaphore::stat";
+static const char *s_pkg_shm = "IPC::SharedMem::stat";
+
 static void *sv2addr(SV *sv)
 {
   if (SvPOK(sv) && SvCUR(sv) == sizeof(void *))
@@ -95,14 +103,6 @@ static void *sv2addr(SV *sv)
 
   return 0;
 }
-
-static const char *s_fmt_not_isa = "Method %s not called a %s object";
-static const char *s_bad_length  = "Bad arg length for %s, length is %d, should be %d";
-static const char *s_sysv_unimpl = "System V %sxxx is not implemented on this machine";
-
-static const char *s_pkg_msg = "IPC::Msg::stat";
-static const char *s_pkg_sem = "IPC::Semaphore::stat";
-static const char *s_pkg_shm = "IPC::SharedMem::stat";
 
 static void assert_sv_isa(SV *sv, const char *name, const char *method)
 {
@@ -347,7 +347,7 @@ memread(addr, sv, pos, size)
     int pos
     int size
   CODE:
-    void *caddr = sv2addr(addr);
+    char *caddr = sv2addr(addr);
     char *dst;
     if (!SvOK(sv))
     {
@@ -372,7 +372,7 @@ memwrite(addr, sv, pos, size)
     int pos
     int size
   CODE:
-    void *caddr = sv2addr(addr);
+    char *caddr = sv2addr(addr);
     STRLEN len;
     const char *src = SvPV_const(sv, len);
     int n = ((int) len > size) ? size : (int) len;
