@@ -180,6 +180,8 @@ PPCODE:
     XSRETURN(1);
 }
 
+MODULE=IPC::SysV	PACKAGE=IPC::SysV
+
 int
 ftok(path, id)
         char *          path
@@ -190,6 +192,15 @@ ftok(path, id)
         ST(0) = k == (key_t) -1 ? &sv_undef : sv_2mortal(newSViv(k));
 #else
         DIE(no_func, "ftok");
+#endif
+
+int
+SHMLBA()
+    CODE:
+#ifdef SHMLBA
+    ST(0) = sv_2mortal(newSViv(SHMLBA));
+#else
+    croak("SHMLBA is not defined on this architecture");
 #endif
 
 BOOT:
@@ -321,9 +332,6 @@ BOOT:
 #endif
 #ifdef SETALL
         {"SETALL", SETALL},
-#endif
-#ifdef SHMLBA
-        {"SHMLBA", SHMLBA},
 #endif
 #ifdef SHM_CLEAR
         {"SHM_CLEAR", SHM_CLEAR},
