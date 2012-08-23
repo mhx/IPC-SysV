@@ -1,3 +1,12 @@
+1.99_04 - 2007-10-14
+
+    * add documentation for IPC::SharedMem
+    * add POD coverage test
+    * use less semaphores in t/sem.t to make sure the
+      tests get run on *BSD
+    * rename constant subroutine to _constant, as it's
+      supposed to be private
+
 1.99_03 - 2007-10-13
 
     * add first IPC::SharedMem implementation

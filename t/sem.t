@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 11 $
+#  $Revision: 12 $
 #  $Author: mhx $
-#  $Date: 2007/10/13 16:06:45 +0100 $
+#  $Date: 2007/10/14 04:14:52 +0100 $
 #
 ################################################################################
 #
@@ -48,7 +48,9 @@ use IPC::SysV qw(
 );
 use IPC::Semaphore;
 
-my $sem = IPC::Semaphore->new(IPC_PRIVATE, 10, S_IRWXU | S_IRWXG | S_IRWXO | IPC_CREAT);
+# FreeBSD's default limit seems to be 9
+my $nsem = 5;
+my $sem = IPC::Semaphore->new(IPC_PRIVATE, $nsem, S_IRWXU | S_IRWXG | S_IRWXO | IPC_CREAT);
 
 unless (defined $sem) {
   my $err = $!;
@@ -67,24 +69,24 @@ pass('acquired a semaphore');
 
 ok(my $st = $sem->stat,'stat it');
 
-ok($sem->setall( (0) x 10),'set all');
+ok($sem->setall((0) x $nsem), 'set all');
 
 my @sem = $sem->getall;
-cmp_ok(join("",@sem),'eq',"0000000000",'get all');
+cmp_ok(join("", @sem), 'eq', "00000", 'get all');
 
 $sem[2] = 1;
-ok($sem->setall( @sem ),'set after change');
+ok($sem->setall(@sem), 'set after change');
 
 @sem = $sem->getall;
-cmp_ok(join("",@sem),'eq',"0010000000",'get again');
+cmp_ok(join("", @sem), 'eq', "00100", 'get again');
 
 my $ncnt = $sem->getncnt(0);
-ok(!$sem->getncnt(0),'procs waiting now');
-ok(defined($ncnt),'prev procs waiting');
+ok(!$sem->getncnt(0), 'procs waiting now');
+ok(defined($ncnt), 'prev procs waiting');
 
-ok($sem->op(2,-1,IPC_NOWAIT),'op nowait');
+ok($sem->op(2, -1, IPC_NOWAIT), 'op nowait');
 
-ok(!$sem->getncnt(0),'no procs waiting');
+ok(!$sem->getncnt(0), 'no procs waiting');
 
 END {
   ok($sem->remove, 'remove semaphore') if defined $sem;

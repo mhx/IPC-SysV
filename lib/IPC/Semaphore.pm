@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 16 $
+#  $Revision: 17 $
 #  $Author: mhx $
-#  $Date: 2007/10/08 21:12:10 +0100 $
+#  $Date: 2007/10/14 04:15:16 +0100 $
 #
 ################################################################################
 #
@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Carp;
 
-$VERSION = do { my @r = '$Snapshot: /IPC-SysV/1.99_03 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
+$VERSION = do { my @r = '$Snapshot: /IPC-SysV/1.99_04 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
 $VERSION = eval $VERSION;
 
 # Figure out if we have support for native sized types
@@ -205,7 +205,7 @@ C<KEY> is equal to C<IPC_PRIVATE>
 
 =item *
 
-C<KEY> does not already  have  a  semaphore  identifier
+C<KEY> does not already have a semaphore identifier
 associated with it, and C<I<FLAGS> & IPC_CREAT> is true.
 
 =back
@@ -300,11 +300,11 @@ of these fields see your system documentation.
 
 =head1 SEE ALSO
 
-L<IPC::SysV> L<Class::Struct> L<semget> L<semctl> L<semop> 
+L<IPC::SysV>, L<Class::Struct>, L<semget>, L<semctl>, L<semop> 
 
 =head1 AUTHORS
 
-Graham Barr <gbarr@pobox.com>
+Graham Barr <gbarr@pobox.com>,
 Marcus Holland-Moritz <mhx@cpan.org>
 
 =head1 COPYRIGHT

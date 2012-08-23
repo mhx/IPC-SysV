@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 3 $
+#  $Revision: 2 $
 #  $Author: mhx $
-#  $Date: 2007/10/13 18:07:53 +0100 $
+#  $Date: 2007/10/14 04:39:15 +0100 $
 #
 ################################################################################
 #
@@ -30,41 +30,19 @@ BEGIN {
 
 use strict;
 
-my @pods;
+my @modules = qw( IPC::SysV IPC::Msg IPC::Semaphore IPC::SharedMem );
 
-# find all potential pod files
-if (open F, "MANIFEST") {
-  chomp(my @files = <F>);
-  close F;
-  for my $f (@files) {
-    next if $f =~ /ppport/;
-    if (open F, $f) {
-      while (<F>) {
-        if (/^=\w+/) {
-          push @pods, $f;
-          last;
-        }
-      }
-      close F;
-    }
-  }
+eval 'use Pod::Coverage 0.10';
+plan skip_all => "testing pod coverage requires Pod::Coverage 0.10" if $@;
+
+eval 'use Test::Pod::Coverage 1.08';
+plan skip_all => "testing pod coverage requires Test::Pod::Coverage 1.08" if $@;
+
+plan tests => scalar @modules;
+
+my $mod = shift @modules;
+pod_coverage_ok($mod, { trustme => [qw( dl_load_flags )] }, "$mod is covered");
+
+for my $mod (@modules) {
+  pod_coverage_ok($mod, "$mod is covered");
 }
-
-# load Test::Pod if possible, otherwise load Test::More
-eval {
-  require Test::Pod;
-  $Test::Pod::VERSION >= 0.95
-      or die "Test::Pod version only $Test::Pod::VERSION";
-  import Test::Pod tests => scalar @pods;
-};
-
-if ($@) {
-  require Test::More;
-  import Test::More skip_all => "testing pod requires Test::Pod";
-}
-else {
-  for my $pod (@pods) {
-    pod_file_ok($pod);
-  }
-}
-

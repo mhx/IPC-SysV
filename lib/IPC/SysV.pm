@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 20 $
+#  $Revision: 22 $
 #  $Author: mhx $
-#  $Date: 2007/10/13 04:13:16 +0100 $
+#  $Date: 2007/10/14 04:39:13 +0100 $
 #
 ################################################################################
 #
@@ -24,7 +24,7 @@ use Config;
 require Exporter;
 @ISA = qw(Exporter);
 
-$VERSION = do { my @r = '$Snapshot: /IPC-SysV/1.99_03 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
+$VERSION = do { my @r = '$Snapshot: /IPC-SysV/1.99_04 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
 $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -70,8 +70,8 @@ sub AUTOLOAD
 {
   my $constname = $AUTOLOAD;
   $constname =~ s/.*:://;
-  die "&IPC::SysV::constant not defined" if $constname eq 'constant';
-  my ($error, $val) = constant($constname);
+  die "&IPC::SysV::_constant not defined" if $constname eq '_constant';
+  my ($error, $val) = _constant($constname);
   if ($error) {
     my (undef, $file, $line) = caller;
     die "$error at $file line $line.\n";
@@ -101,7 +101,7 @@ __END__
 
 =head1 NAME
 
-IPC::SysV - SysV IPC constants
+IPC::SysV - System V IPC constants and system calls
 
 =head1 SYNOPSIS
 
@@ -167,12 +167,12 @@ successful, or false if there is an error.
 
 =head1 SEE ALSO
 
-L<IPC::Msg>, L<IPC::Semaphore>, L<ftok>
+L<IPC::Msg>, L<IPC::Semaphore>, L<IPC::SharedMem>, L<ftok>, L<shmat>, L<shmdt>
 
 =head1 AUTHORS
 
-Graham Barr <gbarr@pobox.com>
-Jarkko Hietaniemi <jhi@iki.fi>
+Graham Barr <gbarr@pobox.com>,
+Jarkko Hietaniemi <jhi@iki.fi>,
 Marcus Holland-Moritz <mhx@cpan.org>
 
 =head1 COPYRIGHT

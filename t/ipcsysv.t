@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 9 $
+#  $Revision: 10 $
 #  $Author: mhx $
-#  $Date: 2007/10/13 04:14:10 +0100 $
+#  $Date: 2007/10/14 04:14:30 +0100 $
 #
 ################################################################################
 #
@@ -108,7 +108,7 @@ SKIP: {
 
   $test_name = 'queue a message';
 
-  if (msgsnd($msg,pack("L$N a*",$msgtype,$msgtext),IPC_NOWAIT)) {
+  if (msgsnd($msg, pack("L$N a*", $msgtype, $msgtext), IPC_NOWAIT)) {
     pass($test_name);
   }
   else {
@@ -132,14 +132,14 @@ EOM
   }
 
   my $data = '';
-  ok(msgctl($msg,IPC_STAT,$data),'msgctl IPC_STAT call');
+  ok(msgctl($msg, IPC_STAT, $data), 'msgctl IPC_STAT call');
 
-  cmp_ok(length($data),'>',0,'msgctl IPC_STAT data');
+  cmp_ok(length($data), '>', 0, 'msgctl IPC_STAT data');
 
   $test_name = 'message get call';
 
   my $msgbuf = '';
-  if (msgrcv($msg,$msgbuf,256,0,IPC_NOWAIT)) {
+  if (msgrcv($msg, $msgbuf, 256, 0, IPC_NOWAIT)) {
     pass($test_name);
   }
   else {
@@ -154,8 +154,8 @@ EOM
 
   $test_name = 'message get data';
 
-  my($rmsgtype,$rmsgtext);
-  ($rmsgtype,$rmsgtext) = unpack("L$N a*",$msgbuf);
+  my($rmsgtype, $rmsgtext);
+  ($rmsgtype, $rmsgtext) = unpack("L$N a*", $msgbuf);
 
   if ($rmsgtype == $msgtype && $rmsgtext eq $msgtext) {
     pass($test_name);
@@ -199,36 +199,36 @@ SKIP: {
   pass('sem acquire');
 
   my $data = '';
-  ok(semctl($sem,0,IPC_STAT,$data),'sem data call');
+  ok(semctl($sem, 0, IPC_STAT, $data), 'sem data call');
 
-  cmp_ok(length($data),'>',0,'sem data len');
+  cmp_ok(length($data), '>', 0, 'sem data len');
 
-  ok(semctl($sem,0,SETALL,pack("s$N*",(0) x $nsem)), 'set all sems');
+  ok(semctl($sem, 0, SETALL, pack("s$N*", (0) x $nsem)), 'set all sems');
 
   $data = "";
-  ok(semctl($sem,0,GETALL,$data), 'get all sems');
+  ok(semctl($sem, 0, GETALL, $data), 'get all sems');
 
-  is(length($data),length(pack("s$N*",(0) x $nsem)), 'right length');
+  is(length($data), length(pack("s$N*", (0) x $nsem)), 'right length');
 
-  my @data = unpack("s$N*",$data);
+  my @data = unpack("s$N*", $data);
 
   my $adata = "0" x $nsem;
 
-  is(scalar(@data),$nsem,'right amount');
-  cmp_ok(join("",@data),'eq',$adata,'right data');
+  is(scalar(@data), $nsem, 'right amount');
+  cmp_ok(join("", @data), 'eq', $adata, 'right data');
 
   my $poke = 2;
 
   $data[$poke] = 1;
-  ok(semctl($sem,0,SETALL,pack("s$N*",@data)),'poke it');
+  ok(semctl($sem, 0, SETALL, pack("s$N*", @data)), 'poke it');
   
   $data = "";
-  ok(semctl($sem,0,GETALL,$data),'and get it back');
+  ok(semctl($sem, 0, GETALL, $data), 'and get it back');
 
-  @data = unpack("s$N*",$data);
-  my $bdata = "0" x $poke . "1" . "0" x ($nsem-$poke-1);
+  @data = unpack("s$N*", $data);
+  my $bdata = "0" x $poke . "1" . "0" x ($nsem - $poke - 1);
 
-  cmp_ok(join("",@data),'eq',$bdata,'changed');
+  cmp_ok(join("", @data), 'eq', $bdata, 'changed');
 }
 
 SKIP: {

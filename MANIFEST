@@ -17,6 +17,7 @@ SysV.xs
 t/ipcsysv.t
 t/msg.t
 t/pod.t
+t/podcov.t
 t/sem.t
 t/shm.t
 TODO

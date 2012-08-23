@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 1 $
+#  $Revision: 2 $
 #  $Author: mhx $
-#  $Date: 2007/10/13 16:07:25 +0100 $
+#  $Date: 2007/10/14 04:16:08 +0100 $
 #
 ################################################################################
 #
@@ -21,7 +21,7 @@ use strict;
 use vars qw($VERSION);
 use Carp;
 
-$VERSION = do { my @r = '$Snapshot: /IPC-SysV/1.99_03 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
+$VERSION = do { my @r = '$Snapshot: /IPC-SysV/1.99_04 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
 $VERSION = eval $VERSION;
 
 # Figure out if we have support for native sized types
@@ -91,7 +91,9 @@ sub detach
 {
   my $self = shift;
   defined $self->addr or return undef;
-  defined shmdt($self->addr);
+  my $rv = defined shmdt($self->addr);
+  undef $self->{_addr} if $rv;
+  $rv;
 }
 
 sub remove
@@ -148,28 +150,28 @@ IPC::SharedMem - SysV Shared Memory IPC object class
     use IPC::SysV qw(IPC_PRIVATE S_IRUSR S_IWUSR);
     use IPC::SharedMem;
 
-    $msg = new IPC::Msg(IPC_PRIVATE, S_IRUSR | S_IWUSR);
+    $shm = IPC::SharedMem->new(IPC_PRIVATE, 8, S_IRWXU);
 
-    $msg->snd(pack("l! a*",$msgtype,$msg));
+    $shm->write(pack("S", 4711), 2, 2);
 
-    $msg->rcv($buf,256);
+    $data = $shm->read(0, 2);
 
-    $ds = $msg->stat;
+    $ds = $shm->stat;
 
-    $msg->remove;
+    $shm->remove;
 
 =head1 DESCRIPTION
 
-A class providing an object based interface to SysV IPC message queues.
+A class providing an object based interface to SysV IPC shared memory.
 
 =head1 METHODS
 
 =over 4
 
-=item new ( KEY , FLAGS )
+=item new ( KEY , SIZE , FLAGS )
 
-Creates a new message queue associated with C<KEY>. A new queue is
-created if
+Creates a new shared memory segment associated with C<KEY>. A new
+segment is created if
 
 =over 4
 
@@ -179,33 +181,40 @@ C<KEY> is equal to C<IPC_PRIVATE>
 
 =item *
 
-C<KEY> does not already  have  a  message queue
-associated with it, and C<I<FLAGS> & IPC_CREAT> is true.
+C<KEY> does not already have a shared memory segment associated
+with it, and C<I<FLAGS> & IPC_CREAT> is true.
 
 =back
 
-On creation of a new message queue C<FLAGS> is used to set the
-permissions.  Be careful not to set any flags that the Sys V
-IPC implementation does not allow: in some systems setting
+On creation of a new shared memory segment C<FLAGS> is used to
+set the permissions.  Be careful not to set any flags that the
+Sys V IPC implementation does not allow: in some systems setting
 execute bits makes the operations fail.
 
 =item id
 
-Returns the system message queue identifier.
+Returns the shared memory identifier.
 
-=item rcv ( BUF, LEN [, TYPE [, FLAGS ]] )
+=item read ( POS, SIZE )
 
-Read a message from the queue. Returns the type of the message read.
-See L<msgrcv>.  The  BUF becomes tainted.
+Read C<SIZE> bytes from the shared memory segment at C<POS>. Returns
+the string read, or C<undef> if there was an error. The return value
+becomes tainted. See L<shmread>.
+
+=item write ( STRING, POS, SIZE )
+
+Write C<SIZE> bytes to the shared memory segment at C<POS>. Returns
+true if successful, or false if there is an error. See L<shmwrite>.
 
 =item remove
 
-Remove the shared memory from the system or mark it as removed.
+Remove the shared memory segment from the system or mark it as
+removed as long as any processes are still attached to it.
 
-=item snd ( TYPE, MSG [, FLAGS ] )
+=item is_removed
 
-Place a message on the queue with the data from C<MSG> and with type C<TYPE>.
-See L<msgsnd>.
+Returns true if the shared memory segment has been removed or
+marked for removal.
 
 =item stat
 
@@ -226,15 +235,32 @@ of these fields see you system documentation.
     dtime
     ctime
 
+=item attach ( [FLAG] )
+
+Permanently attach to the shared memory segment. When a C<IPC::SharedMem>
+object is attached, it will use L<memread> and L<memwrite> instead of
+L<shmread> and L<shmwrite> for accessing the shared memory segment.
+Returns true if successful, or false on error. See L<shmat>.
+
+=item detach
+
+Detach from the shared memory segment that previously has been attached
+to. Returns true if successful, or false on error. See L<shmdt>.
+
+=item addr
+
+Returns the address of the shared memory that has been attached to in a
+format suitable for use with C<pack('P')>. Returns C<undef> if the shared
+memory has not been attached.
+
 =back
 
 =head1 SEE ALSO
 
-L<IPC::SysV> L<Class::Struct>
+L<IPC::SysV>, L<Class::Struct>
 
 =head1 AUTHORS
 
-Graham Barr <gbarr@pobox.com>
 Marcus Holland-Moritz <mhx@cpan.org>
 
 =head1 COPYRIGHT

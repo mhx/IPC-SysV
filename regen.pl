@@ -44,10 +44,11 @@ sub make_constants
 
   eval {
     ExtUtils::Constant::WriteConstants(
-      NAME    => 'IPC::SysV',
-      NAMES   => \@const,
-      XS_FILE => 'const-xs.inc',
-      C_FILE  => 'const-c.inc',
+      NAME       => 'IPC::SysV',
+      NAMES      => \@const,
+      XS_FILE    => 'const-xs.inc',
+      C_FILE     => 'const-c.inc',
+      XS_SUBNAME => '_constant',
     );
   };
 
