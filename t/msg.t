@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 9 $
+#  $Revision: 10 $
 #  $Author: mhx $
-#  $Date: 2007/10/19 19:46:34 +0100 $
+#  $Date: 2007/10/22 12:10:24 +0100 $
 #
 ################################################################################
 #
@@ -40,7 +40,14 @@ use strict;
 use IPC::Msg;
 #Creating a message queue
 
-my $msq = new IPC::Msg(IPC_PRIVATE, S_IRWXU | S_IRWXG | S_IRWXO);
+my $msq = sub {
+  my $code = shift;
+  if (exists $SIG{SYS}) {
+    local $SIG{SYS} = sub { plan(skip_all => "SIGSYS caught") };
+    return $code->();
+  }
+  return $code->();
+}->(sub { new IPC::Msg(IPC_PRIVATE, S_IRWXU | S_IRWXG | S_IRWXO) });
 
 unless (defined $msq) {
   my $info = "IPC::Msg->new failed: $!";

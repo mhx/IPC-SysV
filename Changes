@@ -1,3 +1,11 @@
+1.99_07 - 2007-10-22
+
+    * terminate Makefile.PL on MSWin32 with a message that the
+      module cannot be built here
+    * catch SIGSYS locally to skip tests and issue a message
+      on cygwin that cygserver needs to be installed and the
+      CYGWIN environment variable needs to be set
+
 1.99_06 - 2007-10-19
 
     * handle systems built without SysV IPC support by checking

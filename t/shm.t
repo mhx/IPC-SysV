@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 3 $
+#  $Revision: 4 $
 #  $Author: mhx $
-#  $Date: 2007/10/19 19:46:34 +0100 $
+#  $Date: 2007/10/22 12:10:24 +0100 $
 #
 ################################################################################
 #
@@ -35,7 +35,14 @@ if ($Config{'d_shm'} ne 'define') {
 use IPC::SysV qw( IPC_PRIVATE S_IRWXU );
 use IPC::SharedMem;
 
-my $shm = IPC::SharedMem->new(IPC_PRIVATE, 8, S_IRWXU);
+my $shm = sub {
+  my $code = shift;
+  if (exists $SIG{SYS}) {
+    local $SIG{SYS} = sub { plan(skip_all => "SIGSYS caught") };
+    return $code->();
+  }
+  return $code->();
+}->(sub { IPC::SharedMem->new(IPC_PRIVATE, 8, S_IRWXU) });
 
 unless (defined $shm) {
   my $info = "IPC::SharedMem->new failed: $!";

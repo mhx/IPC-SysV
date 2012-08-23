@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 13 $
+#  $Revision: 14 $
 #  $Author: mhx $
-#  $Date: 2007/10/19 19:46:34 +0100 $
+#  $Date: 2007/10/22 12:10:24 +0100 $
 #
 ################################################################################
 #
@@ -50,7 +50,14 @@ use IPC::Semaphore;
 
 # FreeBSD's default limit seems to be 9
 my $nsem = 5;
-my $sem = IPC::Semaphore->new(IPC_PRIVATE, $nsem, S_IRWXU | S_IRWXG | S_IRWXO | IPC_CREAT);
+my $sem = sub {
+  my $code = shift;
+  if (exists $SIG{SYS}) {
+    local $SIG{SYS} = sub { plan(skip_all => "SIGSYS caught") };
+    return $code->();
+  }
+  return $code->();
+}->(sub { IPC::Semaphore->new(IPC_PRIVATE, $nsem, S_IRWXU | S_IRWXG | S_IRWXO | IPC_CREAT) });
 
 unless (defined $sem) {
   my $info = "IPC::Semaphore->new failed: $!";
