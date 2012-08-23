@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 15 $
+#  $Revision: 18 $
 #  $Author: mhx $
-#  $Date: 2007/12/22 16:39:55 +0000 $
+#  $Date: 2008/11/26 22:12:58 +0000 $
 #
 ################################################################################
 #
@@ -24,9 +24,7 @@ unless ($ENV{'PERL_CORE'}) {
 }
 
 if ($^O eq 'MSWin32') {
-  my $msg = "The IPC::SysV module cannot be built on the $^O platform.";
-  my $str = '*' x length $msg;
-  die "\n$str\n$msg\n$str\n\n";
+  die "OS unsupported\n";
 }
 
 WriteMakefile(
@@ -55,7 +53,8 @@ sub configure
 
   if ($ENV{'PERL_CORE'}) {
     # Pods will be built by installman.
-    push @moreopts, MAN3PODS => {};
+    push @moreopts, MAN3PODS  => {},
+                    realclean => { FILES => "const-c.inc const-xs.inc" };
   }
   else {
     # IPC::SysV is in the core since 5.005
@@ -75,9 +74,14 @@ sub configure
 
 sub MY::libscan
 {
- my($self, $path) = @_;
- return '' if $path =~ m! /(RCS|CVS|SCCS)/ | [~%]$ | \.(swp|orig|rej)$ !x;
- $path;
+  package MY;
+  my($self, $path) = @_;
+  return $path if $self->SUPER::libscan($path) and
+                  $path !~ m! [~%]$
+                            | \.(cache\.cm|swp|orig|rej)$
+                            | regen\.pl$
+                            !x;
+  return '';
 }
 
 sub MY::postamble
