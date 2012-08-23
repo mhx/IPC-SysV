@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 14 $
+#  $Revision: 15 $
 #  $Author: mhx $
-#  $Date: 2007/10/22 12:10:24 +0100 $
+#  $Date: 2008/11/28 17:08:11 +0000 $
 #
 ################################################################################
 #
@@ -61,7 +61,8 @@ my $sem = sub {
 
 unless (defined $sem) {
   my $info = "IPC::Semaphore->new failed: $!";
-  if ($! == &IPC::SysV::ENOSPC || $! == &IPC::SysV::ENOSYS) {
+  if ($! == &IPC::SysV::ENOSPC || $! == &IPC::SysV::ENOSYS ||
+      $! == &IPC::SysV::ENOMEM || $! == &IPC::SysV::EACCES) {
     plan(skip_all => $info);
   }
   else {
