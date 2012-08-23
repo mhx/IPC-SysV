@@ -180,209 +180,6 @@ PPCODE:
     XSRETURN(1);
 }
 
-BOOT:
-{
-    HV *stash = gv_stashpvn("IPC::SysV", 9, TRUE);
-    /*
-     * constant subs for IPC::SysV
-     */
-#ifdef GETVAL
-        newCONSTSUB(stash,"GETVAL", newSViv(GETVAL));
-#endif
-#ifdef GETPID
-        newCONSTSUB(stash,"GETPID", newSViv(GETPID));
-#endif
-#ifdef GETNCNT
-        newCONSTSUB(stash,"GETNCNT", newSViv(GETNCNT));
-#endif
-#ifdef GETZCNT
-        newCONSTSUB(stash,"GETZCNT", newSViv(GETZCNT));
-#endif
-#ifdef GETALL
-        newCONSTSUB(stash,"GETALL", newSViv(GETALL));
-#endif
-#ifdef IPC_ALLOC
-        newCONSTSUB(stash,"IPC_ALLOC", newSViv(IPC_ALLOC));
-#endif
-#ifdef IPC_CREAT
-        newCONSTSUB(stash,"IPC_CREAT", newSViv(IPC_CREAT));
-#endif
-#ifdef IPC_EXCL
-        newCONSTSUB(stash,"IPC_EXCL", newSViv(IPC_EXCL));
-#endif
-#ifdef IPC_LOCKED
-        newCONSTSUB(stash,"IPC_LOCKED", newSViv(IPC_LOCKED));
-#endif
-#ifdef IPC_M
-        newCONSTSUB(stash,"IPC_M", newSViv(IPC_M));
-#endif
-#ifdef IPC_NOERROR
-        newCONSTSUB(stash,"IPC_NOERROR", newSViv(IPC_NOERROR));
-#endif
-#ifdef IPC_NOWAIT
-        newCONSTSUB(stash,"IPC_NOWAIT", newSViv(IPC_NOWAIT));
-#endif
-#ifdef IPC_PRIVATE
-        newCONSTSUB(stash,"IPC_PRIVATE", newSViv(IPC_PRIVATE));
-#endif
-#ifdef IPC_R
-        newCONSTSUB(stash,"IPC_R", newSViv(IPC_R));
-#endif
-#ifdef IPC_RMID
-        newCONSTSUB(stash,"IPC_RMID", newSViv(IPC_RMID));
-#endif
-#ifdef IPC_SET
-        newCONSTSUB(stash,"IPC_SET", newSViv(IPC_SET));
-#endif
-#ifdef IPC_STAT
-        newCONSTSUB(stash,"IPC_STAT", newSViv(IPC_STAT));
-#endif
-#ifdef IPC_W
-        newCONSTSUB(stash,"IPC_W", newSViv(IPC_W));
-#endif
-#ifdef IPC_WANTED
-        newCONSTSUB(stash,"IPC_WANTED", newSViv(IPC_WANTED));
-#endif
-#ifdef MSG_NOERROR
-        newCONSTSUB(stash,"MSG_NOERROR", newSViv(MSG_NOERROR));
-#endif
-#ifdef MSG_FWAIT
-        newCONSTSUB(stash,"MSG_FWAIT", newSViv(MSG_FWAIT));
-#endif
-#ifdef MSG_LOCKED
-        newCONSTSUB(stash,"MSG_LOCKED", newSViv(MSG_LOCKED));
-#endif
-#ifdef MSG_MWAIT
-        newCONSTSUB(stash,"MSG_MWAIT", newSViv(MSG_MWAIT));
-#endif
-#ifdef MSG_WAIT
-        newCONSTSUB(stash,"MSG_WAIT", newSViv(MSG_WAIT));
-#endif
-#ifdef MSG_R
-        newCONSTSUB(stash,"MSG_R", newSViv(MSG_R));
-#endif
-#ifdef MSG_RWAIT
-        newCONSTSUB(stash,"MSG_RWAIT", newSViv(MSG_RWAIT));
-#endif
-#ifdef MSG_STAT
-        newCONSTSUB(stash,"MSG_STAT", newSViv(MSG_STAT));
-#endif
-#ifdef MSG_W
-        newCONSTSUB(stash,"MSG_W", newSViv(MSG_W));
-#endif
-#ifdef MSG_WWAIT
-        newCONSTSUB(stash,"MSG_WWAIT", newSViv(MSG_WWAIT));
-#endif
-#ifdef SEM_A
-        newCONSTSUB(stash,"SEM_A", newSViv(SEM_A));
-#endif
-#ifdef SEM_ALLOC
-        newCONSTSUB(stash,"SEM_ALLOC", newSViv(SEM_ALLOC));
-#endif
-#ifdef SEM_DEST
-        newCONSTSUB(stash,"SEM_DEST", newSViv(SEM_DEST));
-#endif
-#ifdef SEM_ERR
-        newCONSTSUB(stash,"SEM_ERR", newSViv(SEM_ERR));
-#endif
-#ifdef SEM_R
-        newCONSTSUB(stash,"SEM_R", newSViv(SEM_R));
-#endif
-#ifdef SEM_ORDER
-        newCONSTSUB(stash,"SEM_ORDER", newSViv(SEM_ORDER));
-#endif
-#ifdef SEM_UNDO
-        newCONSTSUB(stash,"SEM_UNDO", newSViv(SEM_UNDO));
-#endif
-#ifdef SETVAL
-        newCONSTSUB(stash,"SETVAL", newSViv(SETVAL));
-#endif
-#ifdef SETALL
-        newCONSTSUB(stash,"SETALL", newSViv(SETALL));
-#endif
-#ifdef SHMLBA
-        newCONSTSUB(stash,"SHMLBA", newSViv(SHMLBA));
-#endif
-#ifdef SHM_CLEAR
-        newCONSTSUB(stash,"SHM_CLEAR", newSViv(SHM_CLEAR));
-#endif
-#ifdef SHM_COPY
-        newCONSTSUB(stash,"SHM_COPY", newSViv(SHM_COPY));
-#endif
-#ifdef SHM_DEST
-        newCONSTSUB(stash,"SHM_DEST", newSViv(SHM_DEST));
-#endif
-#ifdef SHM_FMAP
-        newCONSTSUB(stash,"SHM_FMAP", newSViv(SHM_FMAP));
-#endif
-#ifdef SHM_INIT
-        newCONSTSUB(stash,"SHM_INIT", newSViv(SHM_INIT));
-#endif
-#ifdef SHM_LOCK
-        newCONSTSUB(stash,"SHM_LOCK", newSViv(SHM_LOCK));
-#endif
-#ifdef SHM_LOCKED
-        newCONSTSUB(stash,"SHM_LOCKED", newSViv(SHM_LOCKED));
-#endif
-#ifdef SHM_MAP
-        newCONSTSUB(stash,"SHM_MAP", newSViv(SHM_MAP));
-#endif
-#ifdef SHM_NOSWAP
-        newCONSTSUB(stash,"SHM_NOSWAP", newSViv(SHM_NOSWAP));
-#endif
-#ifdef SHM_RDONLY
-        newCONSTSUB(stash,"SHM_RDONLY", newSViv(SHM_RDONLY));
-#endif
-#ifdef SHM_REMOVED
-        newCONSTSUB(stash,"SHM_REMOVED", newSViv(SHM_REMOVED));
-#endif
-#ifdef SHM_RND
-        newCONSTSUB(stash,"SHM_RND", newSViv(SHM_RND));
-#endif
-#ifdef SHM_SHARE_MMU
-        newCONSTSUB(stash,"SHM_SHARE_MMU", newSViv(SHM_SHARE_MMU));
-#endif
-#ifdef SHM_SHATTR
-        newCONSTSUB(stash,"SHM_SHATTR", newSViv(SHM_SHATTR));
-#endif
-#ifdef SHM_SIZE
-        newCONSTSUB(stash,"SHM_SIZE", newSViv(SHM_SIZE));
-#endif
-#ifdef SHM_UNLOCK
-        newCONSTSUB(stash,"SHM_UNLOCK", newSViv(SHM_UNLOCK));
-#endif
-#ifdef SHM_W
-        newCONSTSUB(stash,"SHM_W", newSViv(SHM_W));
-#endif
-#ifdef S_IRUSR
-        newCONSTSUB(stash,"S_IRUSR", newSViv(S_IRUSR));
-#endif
-#ifdef S_IWUSR
-        newCONSTSUB(stash,"S_IWUSR", newSViv(S_IWUSR));
-#endif
-#ifdef S_IRWXU
-        newCONSTSUB(stash,"S_IRWXU", newSViv(S_IRWXU));
-#endif
-#ifdef S_IRGRP
-        newCONSTSUB(stash,"S_IRGRP", newSViv(S_IRGRP));
-#endif
-#ifdef S_IWGRP
-        newCONSTSUB(stash,"S_IWGRP", newSViv(S_IWGRP));
-#endif
-#ifdef S_IRWXG
-        newCONSTSUB(stash,"S_IRWXG", newSViv(S_IRWXG));
-#endif
-#ifdef S_IROTH
-        newCONSTSUB(stash,"S_IROTH", newSViv(S_IROTH));
-#endif
-#ifdef S_IWOTH
-        newCONSTSUB(stash,"S_IWOTH", newSViv(S_IWOTH));
-#endif
-#ifdef S_IRWXO
-        newCONSTSUB(stash,"S_IRWXO", newSViv(S_IRWXO));
-#endif
-}
-
 int
 ftok(path, id)
         char *          path
@@ -394,3 +191,233 @@ ftok(path, id)
 #else
         DIE(no_func, "ftok");
 #endif
+
+BOOT:
+{
+    HV *stash = gv_stashpvn("IPC::SysV", 9, TRUE);
+    /*
+     * constant subs for IPC::SysV
+     */
+     struct { char *n; I32 v; } IPC__SysV__const[] = {
+#ifdef GETVAL
+        {"GETVAL", GETVAL},
+#endif
+#ifdef GETPID
+        {"GETPID", GETPID},
+#endif
+#ifdef GETNCNT
+        {"GETNCNT", GETNCNT},
+#endif
+#ifdef GETZCNT
+        {"GETZCNT", GETZCNT},
+#endif
+#ifdef GETALL
+        {"GETALL", GETALL},
+#endif
+#ifdef IPC_ALLOC
+        {"IPC_ALLOC", IPC_ALLOC},
+#endif
+#ifdef IPC_CREAT
+        {"IPC_CREAT", IPC_CREAT},
+#endif
+#ifdef IPC_EXCL
+        {"IPC_EXCL", IPC_EXCL},
+#endif
+#ifdef IPC_GETACL
+        {"IPC_GETACL", IPC_EXCL},
+#endif
+#ifdef IPC_LOCKED
+        {"IPC_LOCKED", IPC_LOCKED},
+#endif
+#ifdef IPC_M
+        {"IPC_M", IPC_M},
+#endif
+#ifdef IPC_NOERROR
+        {"IPC_NOERROR", IPC_NOERROR},
+#endif
+#ifdef IPC_NOWAIT
+        {"IPC_NOWAIT", IPC_NOWAIT},
+#endif
+#ifdef IPC_PRIVATE
+        {"IPC_PRIVATE", IPC_PRIVATE},
+#endif
+#ifdef IPC_R
+        {"IPC_R", IPC_R},
+#endif
+#ifdef IPC_RMID
+        {"IPC_RMID", IPC_RMID},
+#endif
+#ifdef IPC_SET
+        {"IPC_SET", IPC_SET},
+#endif
+#ifdef IPC_SETACL
+        {"IPC_SETACL", IPC_SETACL},
+#endif
+#ifdef IPC_SETLABEL
+        {"IPC_SETLABEL", IPC_SETLABEL},
+#endif
+#ifdef IPC_STAT
+        {"IPC_STAT", IPC_STAT},
+#endif
+#ifdef IPC_W
+        {"IPC_W", IPC_W},
+#endif
+#ifdef IPC_WANTED
+        {"IPC_WANTED", IPC_WANTED},
+#endif
+#ifdef MSG_NOERROR
+        {"MSG_NOERROR", MSG_NOERROR},
+#endif
+#ifdef MSG_FWAIT
+        {"MSG_FWAIT", MSG_FWAIT},
+#endif
+#ifdef MSG_LOCKED
+        {"MSG_LOCKED", MSG_LOCKED},
+#endif
+#ifdef MSG_MWAIT
+        {"MSG_MWAIT", MSG_MWAIT},
+#endif
+#ifdef MSG_WAIT
+        {"MSG_WAIT", MSG_WAIT},
+#endif
+#ifdef MSG_R
+        {"MSG_R", MSG_R},
+#endif
+#ifdef MSG_RWAIT
+        {"MSG_RWAIT", MSG_RWAIT},
+#endif
+#ifdef MSG_STAT
+        {"MSG_STAT", MSG_STAT},
+#endif
+#ifdef MSG_W
+        {"MSG_W", MSG_W},
+#endif
+#ifdef MSG_WWAIT
+        {"MSG_WWAIT", MSG_WWAIT},
+#endif
+#ifdef SEM_A
+        {"SEM_A", SEM_A},
+#endif
+#ifdef SEM_ALLOC
+        {"SEM_ALLOC", SEM_ALLOC},
+#endif
+#ifdef SEM_DEST
+        {"SEM_DEST", SEM_DEST},
+#endif
+#ifdef SEM_ERR
+        {"SEM_ERR", SEM_ERR},
+#endif
+#ifdef SEM_R
+        {"SEM_R", SEM_R},
+#endif
+#ifdef SEM_ORDER
+        {"SEM_ORDER", SEM_ORDER},
+#endif
+#ifdef SEM_UNDO
+        {"SEM_UNDO", SEM_UNDO},
+#endif
+#ifdef SETVAL
+        {"SETVAL", SETVAL},
+#endif
+#ifdef SETALL
+        {"SETALL", SETALL},
+#endif
+#ifdef SHMLBA
+        {"SHMLBA", SHMLBA},
+#endif
+#ifdef SHM_CLEAR
+        {"SHM_CLEAR", SHM_CLEAR},
+#endif
+#ifdef SHM_COPY
+        {"SHM_COPY", SHM_COPY},
+#endif
+#ifdef SHM_DCACHE
+        {"SHM_DCACHE", SHM_DCACHE},
+#endif
+#ifdef SHM_DEST
+        {"SHM_DEST", SHM_DEST},
+#endif
+#ifdef SHM_ECACHE
+        {"SHM_ECACHE", SHM_ECACHE},
+#endif
+#ifdef SHM_FMAP
+        {"SHM_FMAP", SHM_FMAP},
+#endif
+#ifdef SHM_ICACHE
+        {"SHM_ICACHE", SHM_ICACHE},
+#endif
+#ifdef SHM_INIT
+        {"SHM_INIT", SHM_INIT},
+#endif
+#ifdef SHM_LOCK
+        {"SHM_LOCK", SHM_LOCK},
+#endif
+#ifdef SHM_LOCKED
+        {"SHM_LOCKED", SHM_LOCKED},
+#endif
+#ifdef SHM_MAP
+        {"SHM_MAP", SHM_MAP},
+#endif
+#ifdef SHM_NOSWAP
+        {"SHM_NOSWAP", SHM_NOSWAP},
+#endif
+#ifdef SHM_RDONLY
+        {"SHM_RDONLY", SHM_RDONLY},
+#endif
+#ifdef SHM_REMOVED
+        {"SHM_REMOVED", SHM_REMOVED},
+#endif
+#ifdef SHM_RND
+        {"SHM_RND", SHM_RND},
+#endif
+#ifdef SHM_SHARE_MMU
+        {"SHM_SHARE_MMU", SHM_SHARE_MMU},
+#endif
+#ifdef SHM_SHATTR
+        {"SHM_SHATTR", SHM_SHATTR},
+#endif
+#ifdef SHM_SIZE
+        {"SHM_SIZE", SHM_SIZE},
+#endif
+#ifdef SHM_UNLOCK
+        {"SHM_UNLOCK", SHM_UNLOCK},
+#endif
+#ifdef SHM_W
+        {"SHM_W", SHM_W},
+#endif
+#ifdef S_IRUSR
+        {"S_IRUSR", S_IRUSR},
+#endif
+#ifdef S_IWUSR
+        {"S_IWUSR", S_IWUSR},
+#endif
+#ifdef S_IRWXU
+        {"S_IRWXU", S_IRWXU},
+#endif
+#ifdef S_IRGRP
+        {"S_IRGRP", S_IRGRP},
+#endif
+#ifdef S_IWGRP
+        {"S_IWGRP", S_IWGRP},
+#endif
+#ifdef S_IRWXG
+        {"S_IRWXG", S_IRWXG},
+#endif
+#ifdef S_IROTH
+        {"S_IROTH", S_IROTH},
+#endif
+#ifdef S_IWOTH
+        {"S_IWOTH", S_IWOTH},
+#endif
+#ifdef S_IRWXO
+        {"S_IRWXO", S_IRWXO},
+#endif
+	{Nullch,0}};
+    char *name;
+    int i;
+
+    for(i = 0 ; name = IPC__SysV__const[i].n ; i++) {
+	newCONSTSUB(stash,name, newSViv(IPC__SysV__const[i].v));
+    }
+}
+

@@ -4,14 +4,14 @@ modify it under the same terms as Perl itself.
 
 The SysV-IPC contains three packages
 
-    IPC::Semaphore - Provides an object interface to usinf SysV
-    IPC semaphores
+    IPC::Semaphore
+    - Provides an object interface to using SysV IPC semaphores
 
-    IPC::Msg - Provides an object interface to usinf SysV
-    IPC messages
+    IPC::Msg
+    - Provides an object interface to using SysV IPC messages
 
-    IPC::SysV - Provides the constants required to use the system
-    SysV IPC calls.
+    IPC::SysV
+    - Provides the constants required to use the system SysV IPC calls.
 
 Currently there is not object support for SysV shared memory, but
 SysV::SharedMem is a project for the future.
