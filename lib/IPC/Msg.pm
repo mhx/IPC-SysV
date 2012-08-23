@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 18 $
+#  $Revision: 19 $
 #  $Author: mhx $
-#  $Date: 2010/03/07 15:01:42 +0000 $
+#  $Date: 2010/05/23 09:37:46 +0100 $
 #
 ################################################################################
 #
@@ -21,7 +21,7 @@ use strict;
 use vars qw($VERSION);
 use Carp;
 
-$VERSION = do { my @r = '$Snapshot: /IPC-SysV/2.02 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
+$VERSION = do { my @r = '$Snapshot: /IPC-SysV/2.03 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
 $VERSION = eval $VERSION;
 
 # Figure out if we have support for native sized types
@@ -130,9 +130,9 @@ IPC::Msg - SysV Msg IPC object class
 
     $msg = IPC::Msg->new(IPC_PRIVATE, S_IRUSR | S_IWUSR);
 
-    $msg->snd(pack("l! a*",$msgtype,$msg));
+    $msg->snd($msgtype, $msgdata);
 
-    $msg->rcv($buf,256);
+    $msg->rcv($buf, 256);
 
     $ds = $msg->stat;
 
@@ -176,7 +176,7 @@ Returns the system message queue identifier.
 =item rcv ( BUF, LEN [, TYPE [, FLAGS ]] )
 
 Read a message from the queue. Returns the type of the message read.
-See L<msgrcv>.  The  BUF becomes tainted.
+See L<msgrcv>.  The BUF becomes tainted.
 
 =item remove
 
