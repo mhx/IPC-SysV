@@ -1,6 +1,17 @@
+1.99_01 - 2007-10-13
+
+    * dual-life code and tests
+    * backport to 5.004_05
+    * make tests to use Test::More
+    * add shmat(), shmdt(), memread(), memwrite()
+    * improve ftok() interface
+    * fix inconsistencies between SysV.xs and SysV.pm
+    * autogenerate all constants
+    * make checking against ENOSPC more robust
+
 1.04 - 2007-09-27
 
-    Internal version. Integrate all changes up to blead.
+	Internal version. Integrate all changes up to blead.
 
 	* ChangeLog@1:
 	  initial checkin

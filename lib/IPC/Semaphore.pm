@@ -1,8 +1,18 @@
-# IPC::Semaphore
+################################################################################
 #
-# Copyright (c) 1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
-# This program is free software; you can redistribute it and/or
-# modify it under the same terms as Perl itself.
+#  $Revision: 16 $
+#  $Author: mhx $
+#  $Date: 2007/10/08 21:12:10 +0100 $
+#
+################################################################################
+#
+#  Version 2.x, Copyright (C) 2007, Marcus Holland-Moritz <mhx@cpan.org>.
+#  Version 1.x, Copyright (C) 1997, Graham Barr <gbarr@pobox.com>.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the same terms as Perl itself.
+#
+################################################################################
 
 package IPC::Semaphore;
 
@@ -12,8 +22,11 @@ use strict;
 use vars qw($VERSION);
 use Carp;
 
-$VERSION = "1.02";
+$VERSION = do { my @r = '$Snapshot: /IPC-SysV/1.99_01 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
 $VERSION = eval $VERSION;
+
+# Figure out if we have support for native sized types
+my $N = do { my $foo = eval { pack "L!", 0 }; $@ ? '' : '!' };
 
 {
     package IPC::Semaphore::stat;
@@ -89,7 +102,7 @@ sub op {
     @_ >= 4 || croak '$sem->op( OPLIST )';
     my $self = shift;
     croak 'Bad arg count' if @_ % 3;
-    my $data = pack("s!*",@_);
+    my $data = pack("s$N*",@_);
     semop($$self,$data);
 }
 
@@ -127,12 +140,12 @@ sub getall {
     my $data = "";
     semctl($$self,0,GETALL,$data)
 	or return ();
-    (unpack("s!*",$data));
+    (unpack("s$N*",$data));
 }
 
 sub setall {
     my $self = shift;
-    my $data = pack("s!*",@_);
+    my $data = pack("s$N*",@_);
     semctl($$self,0,SETALL,$data);
 }
 
@@ -289,14 +302,18 @@ of these fields see your system documentation.
 
 L<IPC::SysV> L<Class::Struct> L<semget> L<semctl> L<semop> 
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Graham Barr <gbarr@pobox.com>
+Marcus Holland-Moritz <mhx@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 1997 Graham Barr. All rights reserved.
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+Version 2.x, Copyright (C) 2007, Marcus Holland-Moritz.
+
+Version 1.x, Copyright (c) 1997, Graham Barr.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
 =cut

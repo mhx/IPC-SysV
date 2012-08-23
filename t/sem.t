@@ -1,26 +1,41 @@
+################################################################################
+#
+#  $Revision: 9 $
+#  $Author: mhx $
+#  $Date: 2007/10/13 04:14:11 +0100 $
+#
+################################################################################
+#
+#  Version 2.x, Copyright (C) 2007, Marcus Holland-Moritz <mhx@cpan.org>.
+#  Version 1.x, Copyright (C) 1999, Graham Barr <gbarr@pobox.com>.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the same terms as Perl itself.
+#
+################################################################################
+
 BEGIN {
+  if ($ENV{'PERL_CORE'}) {
     chdir 't' if -d 't';
+    @INC = '../lib' if -d '../lib' && -d '../ext';
+  }
 
-    @INC = qw(. ../lib);
-    require 'test.pl';
+  require Test::More; import Test::More;
+  require Config; import Config;
+
+  if ($ENV{'PERL_CORE'} && $Config{'extensions'} !~ m[\bIPC/SysV\b]) {
+    plan(skip_all => 'IPC::SysV was not built');
+  }
 }
 
-require Config; import Config;
-
-$TEST_COUNT = 11;
-
-if ($Config{'extensions'} !~ /\bIPC\/SysV\b/) {
-    skip_all('IPC::SysV was not built');
-}
-elsif ($Config{'d_sem'} ne 'define') {
-    skip_all('$Config{d_sem} undefined');
+if ($Config{'d_sem'} ne 'define') {
+  plan(skip_all => '$Config{d_sem} undefined');
 }
 elsif ($Config{'d_msg'} ne 'define') {
-    skip_all('$Config{d_msg} undefined');
+  plan(skip_all => '$Config{d_msg} undefined');
 }
-else {
-    plan( tests => $TEST_COUNT );
-}
+
+plan(tests => 11);
 
 use IPC::SysV qw(
 	SETALL
@@ -35,19 +50,17 @@ use IPC::SysV qw(
 );
 use IPC::Semaphore;
 
-SKIP: {
+my $sem = IPC::Semaphore->new(IPC_PRIVATE, 10, S_IRWXU | S_IRWXG | S_IRWXO | IPC_CREAT);
 
-my $sem =
-    IPC::Semaphore->new(IPC_PRIVATE, 10, S_IRWXU | S_IRWXG | S_IRWXO | IPC_CREAT);
-if (!$sem) {
-    if ($! eq 'No space left on device') {
-        # "normal" error
-        skip( "cannot proceed: IPC::Semaphore->new() said: $!", $TEST_COUNT);
-    }
-    else {
-        # unexpected error
-        die "IPC::Semaphore->new(): ",$!+0," $!\n";
-    }
+unless (defined $sem) {
+  my $err = $!;
+  my $info = "IPC::Semaphore->new failed: $err";
+  if ($err == &IPC::SysV::ENOSPC) {
+    plan(skip_all => $info);
+  }
+  else {
+    die $info;
+  }
 }
 
 pass('acquired a semaphore');
@@ -74,9 +87,5 @@ ok($sem->op(2,-1,IPC_NOWAIT),'op nowait');
 ok(!$sem->getncnt(0),'no procs waiting');
 
 END {
-    if ($sem) {
-        ok($sem->remove,'release');
-    }
+  ok($sem->remove,'release') if defined $sem;
 }
-
-} # SKIP

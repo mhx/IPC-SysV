@@ -1,8 +1,18 @@
-# IPC::Msg.pm
+################################################################################
 #
-# Copyright (c) 1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
-# This program is free software; you can redistribute it and/or
-# modify it under the same terms as Perl itself.
+#  $Revision: 15 $
+#  $Author: mhx $
+#  $Date: 2007/10/08 21:12:09 +0100 $
+#
+################################################################################
+#
+#  Version 2.x, Copyright (C) 2007, Marcus Holland-Moritz <mhx@cpan.org>.
+#  Version 1.x, Copyright (C) 1997, Graham Barr <gbarr@pobox.com>.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the same terms as Perl itself.
+#
+################################################################################
 
 package IPC::Msg;
 
@@ -11,8 +21,11 @@ use strict;
 use vars qw($VERSION);
 use Carp;
 
-$VERSION = "1.02";
+$VERSION = do { my @r = '$Snapshot: /IPC-SysV/1.99_01 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
 $VERSION = eval $VERSION;
+
+# Figure out if we have support for native sized types
+my $N = do { my $foo = eval { pack "L!", 0 }; $@ ? '' : '!' };
 
 {
     package IPC::Msg::stat;
@@ -91,14 +104,14 @@ sub rcv {
     msgrcv($$self,$buf,$_[1],$_[2] || 0, $_[3] || 0) or
 	return;
     my $type;
-    ($type,$_[0]) = unpack("l! a*",$buf);
+    ($type,$_[0]) = unpack("l$N a*",$buf);
     $type;
 }
 
 sub snd {
     @_ <= 4 && @_ >= 3 or  croak '$msg->snd( TYPE, BUF, FLAGS )';
     my $self = shift;
-    msgsnd($$self,pack("l! a*",$_[0],$_[1]), $_[2] || 0);
+    msgsnd($$self,pack("l$N a*",$_[0],$_[1]), $_[2] || 0);
 }
 
 
@@ -214,15 +227,19 @@ of these fields see you system documentation.
 
 L<IPC::SysV> L<Class::Struct>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Graham Barr <gbarr@pobox.com>
+Marcus Holland-Moritz <mhx@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 1997 Graham Barr. All rights reserved.
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+Version 2.x, Copyright (C) 2007, Marcus Holland-Moritz.
+
+Version 1.x, Copyright (c) 1997, Graham Barr.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
 =cut
 
