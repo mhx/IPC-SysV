@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 10 $
+#  $Revision: 11 $
 #  $Author: mhx $
-#  $Date: 2007/10/13 10:08:49 +0100 $
+#  $Date: 2007/10/13 16:06:45 +0100 $
 #
 ################################################################################
 #
@@ -87,5 +87,5 @@ ok($sem->op(2,-1,IPC_NOWAIT),'op nowait');
 ok(!$sem->getncnt(0),'no procs waiting');
 
 END {
-  ok($sem->remove,'release') if defined $sem;
+  ok($sem->remove, 'remove semaphore') if defined $sem;
 }

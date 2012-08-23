@@ -1,8 +1,8 @@
 /*******************************************************************************
 *
-*  $Revision: 26 $
+*  $Revision: 27 $
 *  $Author: mhx $
-*  $Date: 2007/10/13 04:13:17 +0100 $
+*  $Date: 2007/10/13 16:06:31 +0100 $
 *
 ********************************************************************************
 *
@@ -74,6 +74,16 @@
 #  endif
 #endif
 
+#define AV_FETCH_IV(ident, av, index)                         \
+        STMT_START {                                          \
+          SV **svp;                                           \
+          if ((svp = av_fetch((av), (index), FALSE)) != NULL) \
+            ident = SvIV(*svp);                               \
+        } STMT_END
+
+#define AV_STORE_IV(ident, av, index)                         \
+          av_store((av), (index), newSViv(ident))
+
 static void *sv2addr(SV *sv)
 {
   if (SvPOK(sv) && SvCUR(sv) == sizeof(void *))
@@ -86,7 +96,32 @@ static void *sv2addr(SV *sv)
   return 0;
 }
 
+static const char *s_fmt_not_isa = "Method %s not called a %s object";
+static const char *s_bad_length  = "Bad arg length for %s, length is %d, should be %d";
+static const char *s_sysv_unimpl = "System V %sxxx is not implemented on this machine";
+
+static const char *s_pkg_msg = "IPC::Msg::stat";
+static const char *s_pkg_sem = "IPC::Semaphore::stat";
+static const char *s_pkg_shm = "IPC::SharedMem::stat";
+
+static void assert_sv_isa(SV *sv, const char *name, const char *method)
+{
+  if (!sv_isa(sv, name))
+  {
+    croak(s_fmt_not_isa, method, name);
+  }
+}
+
+static void assert_data_length(const char *name, int got, int expected)
+{
+  if (got != expected)
+  {
+    croak(s_bad_length, name, got, expected);
+  }
+}
+
 #include "const-c.inc"
+
 
 MODULE=IPC::SysV	PACKAGE=IPC::Msg::stat
 
@@ -95,106 +130,65 @@ PROTOTYPES: ENABLE
 void
 pack(obj)
     SV	* obj
-  PPCODE:
+PPCODE:
   {
 #ifdef HAS_MSG
-    SV *sv;
+    AV *list = (AV*) SvRV(obj);
     struct msqid_ds ds;
-    AV *list = (AV*)SvRV(obj);
-    sv = *av_fetch(list,0,TRUE); ds.msg_perm.uid = SvIV(sv);
-    sv = *av_fetch(list,1,TRUE); ds.msg_perm.gid = SvIV(sv);
-    sv = *av_fetch(list,4,TRUE); ds.msg_perm.mode = SvIV(sv);
-    sv = *av_fetch(list,6,TRUE); ds.msg_qbytes = SvIV(sv);
+    assert_sv_isa(obj, s_pkg_msg, "pack");
+    AV_FETCH_IV(ds.msg_perm.uid , list,  0);
+    AV_FETCH_IV(ds.msg_perm.gid , list,  1);
+    AV_FETCH_IV(ds.msg_perm.cuid, list,  2);
+    AV_FETCH_IV(ds.msg_perm.cgid, list,  3);
+    AV_FETCH_IV(ds.msg_perm.mode, list,  4);
+    AV_FETCH_IV(ds.msg_qnum     , list,  5);
+    AV_FETCH_IV(ds.msg_qbytes   , list,  6);
+    AV_FETCH_IV(ds.msg_lspid    , list,  7);
+    AV_FETCH_IV(ds.msg_lrpid    , list,  8);
+    AV_FETCH_IV(ds.msg_stime    , list,  9);
+    AV_FETCH_IV(ds.msg_rtime    , list, 10);
+    AV_FETCH_IV(ds.msg_ctime    , list, 11);
     ST(0) = sv_2mortal(newSVpvn((char *) &ds, sizeof(ds)));
     XSRETURN(1);
 #else
-    croak("System V msgxxx is not implemented on this machine");
+    croak(s_sysv_unimpl, "msg");
 #endif
   }
 
 void
-unpack(obj,buf)
-    SV * obj
-    SV * buf
-  PPCODE:
-  {
-#ifdef HAS_MSG
-    STRLEN len;
-    SV **sv_ptr;
-    AV *list = (AV*) SvRV(obj);
-    struct msqid_ds *ds = (struct msqid_ds *) SvPV(buf, len);
-    if (len != sizeof(*ds))
-    {
-      croak("Bad arg length for %s, length is %d, should be %d",
-      	    "IPC::Msg::stat",
-      	    len, sizeof(*ds));
-    }
-    sv_ptr = av_fetch(list,0,TRUE);
-    sv_setiv(*sv_ptr, ds->msg_perm.uid);
-    sv_ptr = av_fetch(list,1,TRUE);
-    sv_setiv(*sv_ptr, ds->msg_perm.gid);
-    sv_ptr = av_fetch(list,2,TRUE);
-    sv_setiv(*sv_ptr, ds->msg_perm.cuid);
-    sv_ptr = av_fetch(list,3,TRUE);
-    sv_setiv(*sv_ptr, ds->msg_perm.cgid);
-    sv_ptr = av_fetch(list,4,TRUE);
-    sv_setiv(*sv_ptr, ds->msg_perm.mode);
-    sv_ptr = av_fetch(list,5,TRUE);
-    sv_setiv(*sv_ptr, ds->msg_qnum);
-    sv_ptr = av_fetch(list,6,TRUE);
-    sv_setiv(*sv_ptr, ds->msg_qbytes);
-    sv_ptr = av_fetch(list,7,TRUE);
-    sv_setiv(*sv_ptr, ds->msg_lspid);
-    sv_ptr = av_fetch(list,8,TRUE);
-    sv_setiv(*sv_ptr, ds->msg_lrpid);
-    sv_ptr = av_fetch(list,9,TRUE);
-    sv_setiv(*sv_ptr, ds->msg_stime);
-    sv_ptr = av_fetch(list,10,TRUE);
-    sv_setiv(*sv_ptr, ds->msg_rtime);
-    sv_ptr = av_fetch(list,11,TRUE);
-    sv_setiv(*sv_ptr, ds->msg_ctime);
-    XSRETURN(1);
-#else
-    croak("System V msgxxx is not implemented on this machine");
-#endif
-  }
-
-MODULE=IPC::SysV	PACKAGE=IPC::Semaphore::stat
-
-void
-unpack(obj,ds)
+unpack(obj, ds)
     SV * obj
     SV * ds
 PPCODE:
   {
-#ifdef HAS_SEM
-    STRLEN len;
+#ifdef HAS_MSG
     AV *list = (AV*) SvRV(obj);
-    struct semid_ds *data = (struct semid_ds *) SvPV(ds, len);
-    if(!sv_isa(obj, "IPC::Semaphore::stat"))
-    {
-      croak("method %s not called a %s object",
-      	"unpack","IPC::Semaphore::stat");
-    }
-    if (len != sizeof(*data))
-    {
-      croak("Bad arg length for %s, length is %d, should be %d",
-      	    "IPC::Semaphore::stat",
-      	    len, sizeof(*data));
-    }
-    sv_setiv(*av_fetch(list,0,TRUE), data[0].sem_perm.uid);
-    sv_setiv(*av_fetch(list,1,TRUE), data[0].sem_perm.gid);
-    sv_setiv(*av_fetch(list,2,TRUE), data[0].sem_perm.cuid);
-    sv_setiv(*av_fetch(list,3,TRUE), data[0].sem_perm.cgid);
-    sv_setiv(*av_fetch(list,4,TRUE), data[0].sem_perm.mode);
-    sv_setiv(*av_fetch(list,5,TRUE), data[0].sem_ctime);
-    sv_setiv(*av_fetch(list,6,TRUE), data[0].sem_otime);
-    sv_setiv(*av_fetch(list,7,TRUE), data[0].sem_nsems);
+    STRLEN len;
+    const struct msqid_ds *data = (struct msqid_ds *) SvPV_const(ds, len);
+    assert_sv_isa(obj, s_pkg_msg, "unpack");
+    assert_data_length(s_pkg_msg, len, sizeof(*data));
+    AV_STORE_IV(data->msg_perm.uid , list,  0);
+    AV_STORE_IV(data->msg_perm.gid , list,  1);
+    AV_STORE_IV(data->msg_perm.cuid, list,  2);
+    AV_STORE_IV(data->msg_perm.cgid, list,  3);
+    AV_STORE_IV(data->msg_perm.mode, list,  4);
+    AV_STORE_IV(data->msg_qnum     , list,  5);
+    AV_STORE_IV(data->msg_qbytes   , list,  6);
+    AV_STORE_IV(data->msg_lspid    , list,  7);
+    AV_STORE_IV(data->msg_lrpid    , list,  8);
+    AV_STORE_IV(data->msg_stime    , list,  9);
+    AV_STORE_IV(data->msg_rtime    , list, 10);
+    AV_STORE_IV(data->msg_ctime    , list, 11);
     XSRETURN(1);
 #else
-    croak("System V semxxx is not implemented on this machine");
+    croak(s_sysv_unimpl, "msg");
 #endif
   }
+
+
+MODULE=IPC::SysV	PACKAGE=IPC::Semaphore::stat
+
+PROTOTYPES: ENABLE
 
 void
 pack(obj)
@@ -202,38 +196,117 @@ pack(obj)
 PPCODE:
   {
 #ifdef HAS_SEM
-    SV **sv_ptr;
+    AV *list = (AV*) SvRV(obj);
     struct semid_ds ds;
-    AV *list = (AV*)SvRV(obj);
-    if(!sv_isa(obj, "IPC::Semaphore::stat"))
-    {
-      croak("method %s not called a %s object",
-            "pack","IPC::Semaphore::stat");
-    }
-    if((sv_ptr = av_fetch(list,0,TRUE)) && *sv_ptr)
-      ds.sem_perm.uid = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,1,TRUE)) && *sv_ptr)
-      ds.sem_perm.gid = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,2,TRUE)) && *sv_ptr)
-      ds.sem_perm.cuid = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,3,TRUE)) && *sv_ptr)
-      ds.sem_perm.cgid = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,4,TRUE)) && *sv_ptr)
-      ds.sem_perm.mode = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,5,TRUE)) && *sv_ptr)
-      ds.sem_ctime = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,6,TRUE)) && *sv_ptr)
-      ds.sem_otime = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,7,TRUE)) && *sv_ptr)
-      ds.sem_nsems = SvIV(*sv_ptr);
+    assert_sv_isa(obj, s_pkg_sem, "pack");
+    AV_FETCH_IV(ds.sem_perm.uid , list, 0);
+    AV_FETCH_IV(ds.sem_perm.gid , list, 1);
+    AV_FETCH_IV(ds.sem_perm.cuid, list, 2);
+    AV_FETCH_IV(ds.sem_perm.cgid, list, 3);
+    AV_FETCH_IV(ds.sem_perm.mode, list, 4);
+    AV_FETCH_IV(ds.sem_ctime    , list, 5);
+    AV_FETCH_IV(ds.sem_otime    , list, 6);
+    AV_FETCH_IV(ds.sem_nsems    , list, 7);
     ST(0) = sv_2mortal(newSVpvn((char *) &ds, sizeof(ds)));
     XSRETURN(1);
 #else
-    croak("System V semxxx is not implemented on this machine");
+    croak(s_sysv_unimpl, "sem");
 #endif
   }
 
+void
+unpack(obj, ds)
+    SV * obj
+    SV * ds
+PPCODE:
+  {
+#ifdef HAS_SEM
+    AV *list = (AV*) SvRV(obj);
+    STRLEN len;
+    const struct semid_ds *data = (struct semid_ds *) SvPV_const(ds, len);
+    assert_sv_isa(obj, s_pkg_sem, "unpack");
+    assert_data_length(s_pkg_sem, len, sizeof(*data));
+    AV_STORE_IV(data->sem_perm.uid , list, 0);
+    AV_STORE_IV(data->sem_perm.gid , list, 1);
+    AV_STORE_IV(data->sem_perm.cuid, list, 2);
+    AV_STORE_IV(data->sem_perm.cgid, list, 3);
+    AV_STORE_IV(data->sem_perm.mode, list, 4);
+    AV_STORE_IV(data->sem_ctime    , list, 5);
+    AV_STORE_IV(data->sem_otime    , list, 6);
+    AV_STORE_IV(data->sem_nsems    , list, 7);
+    XSRETURN(1);
+#else
+    croak(s_sysv_unimpl, "sem");
+#endif
+  }
+
+
+MODULE=IPC::SysV	PACKAGE=IPC::SharedMem::stat
+
+PROTOTYPES: ENABLE
+
+void
+pack(obj)
+    SV	* obj
+PPCODE:
+  {
+#ifdef HAS_SHM
+    AV *list = (AV*) SvRV(obj);
+    struct shmid_ds ds;
+    assert_sv_isa(obj, s_pkg_shm, "pack");
+    AV_FETCH_IV(ds.shm_perm.uid , list,  0);
+    AV_FETCH_IV(ds.shm_perm.gid , list,  1);
+    AV_FETCH_IV(ds.shm_perm.cuid, list,  2);
+    AV_FETCH_IV(ds.shm_perm.cgid, list,  3);
+    AV_FETCH_IV(ds.shm_perm.mode, list,  4);
+    AV_FETCH_IV(ds.shm_segsz    , list,  5);
+    AV_FETCH_IV(ds.shm_lpid     , list,  6);
+    AV_FETCH_IV(ds.shm_cpid     , list,  7);
+    AV_FETCH_IV(ds.shm_nattch   , list,  8);
+    AV_FETCH_IV(ds.shm_atime    , list,  9);
+    AV_FETCH_IV(ds.shm_dtime    , list, 10);
+    AV_FETCH_IV(ds.shm_ctime    , list, 11);
+    ST(0) = sv_2mortal(newSVpvn((char *) &ds, sizeof(ds)));
+    XSRETURN(1);
+#else
+    croak(s_sysv_unimpl, "shm");
+#endif
+  }
+
+void
+unpack(obj, ds)
+    SV * obj
+    SV * ds
+PPCODE:
+  {
+#ifdef HAS_SHM
+    AV *list = (AV*) SvRV(obj);
+    STRLEN len;
+    const struct shmid_ds *data = (struct shmid_ds *) SvPV_const(ds, len);
+    assert_sv_isa(obj, s_pkg_shm, "unpack");
+    assert_data_length(s_pkg_shm, len, sizeof(*data));
+    AV_STORE_IV(data->shm_perm.uid , list,  0);
+    AV_STORE_IV(data->shm_perm.gid , list,  1);
+    AV_STORE_IV(data->shm_perm.cuid, list,  2);
+    AV_STORE_IV(data->shm_perm.cgid, list,  3);
+    AV_STORE_IV(data->shm_perm.mode, list,  4);
+    AV_STORE_IV(data->shm_segsz    , list,  5);
+    AV_STORE_IV(data->shm_lpid     , list,  6);
+    AV_STORE_IV(data->shm_cpid     , list,  7);
+    AV_STORE_IV(data->shm_nattch   , list,  8);
+    AV_STORE_IV(data->shm_atime    , list,  9);
+    AV_STORE_IV(data->shm_dtime    , list, 10);
+    AV_STORE_IV(data->shm_ctime    , list, 11);
+    XSRETURN(1);
+#else
+    croak(s_sysv_unimpl, "shm");
+#endif
+  }
+
+
 MODULE=IPC::SysV	PACKAGE=IPC::SysV
+
+PROTOTYPES: ENABLE
 
 void
 ftok(path, id = &PL_sv_undef)

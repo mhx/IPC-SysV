@@ -5,6 +5,7 @@ hints/cygwin.pl
 hints/next_3.pl
 lib/IPC/Msg.pm
 lib/IPC/Semaphore.pm
+lib/IPC/SharedMem.pm
 lib/IPC/SysV.pm
 Makefile.PL
 MANIFEST
@@ -17,5 +18,6 @@ t/ipcsysv.t
 t/msg.t
 t/pod.t
 t/sem.t
+t/shm.t
 TODO
 typemap

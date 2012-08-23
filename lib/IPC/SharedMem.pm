@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 15 $
+#  $Revision: 1 $
 #  $Author: mhx $
-#  $Date: 2007/10/08 21:12:09 +0100 $
+#  $Date: 2007/10/13 16:07:25 +0100 $
 #
 ################################################################################
 #
@@ -14,9 +14,9 @@
 #
 ################################################################################
 
-package IPC::Msg;
+package IPC::SharedMem;
 
-use IPC::SysV qw(IPC_STAT IPC_SET IPC_RMID);
+use IPC::SysV qw(IPC_STAT IPC_RMID shmat shmdt memread memwrite);
 use strict;
 use vars qw($VERSION);
 use Carp;
@@ -28,92 +28,112 @@ $VERSION = eval $VERSION;
 my $N = do { my $foo = eval { pack "L!", 0 }; $@ ? '' : '!' };
 
 {
-    package IPC::Msg::stat;
+    package IPC::SharedMem::stat;
 
     use Class::Struct qw(struct);
 
-    struct 'IPC::Msg::stat' => [
+    struct 'IPC::SharedMem::stat' => [
 	uid	=> '$',
 	gid	=> '$',
 	cuid	=> '$',
 	cgid	=> '$',
 	mode	=> '$',
-	qnum	=> '$',
-	qbytes	=> '$',
-	lspid	=> '$',
-	lrpid	=> '$',
-	stime	=> '$',
-	rtime	=> '$',
+	segsz	=> '$',
+	lpid	=> '$',
+	cpid	=> '$',
+	nattch	=> '$',
+	atime	=> '$',
+	dtime	=> '$',
 	ctime	=> '$',
     ];
 }
 
-sub new {
-    @_ == 3 || croak 'new IPC::Msg ( KEY , FLAGS )';
-    my $class = shift;
+sub new
+{
+  @_ == 4 or croak 'IPC::SharedMem->new(KEY, SIZE, FLAGS)';
+  my($class, $key, $size, $flags) = @_;
 
-    my $id = msgget($_[0],$_[1]);
+  my $id = shmget $key, $size, $flags or return undef;
 
-    defined($id)
-	? bless \$id, $class
-	: undef;
+  bless { _id => $id, _addr => undef, _isrm => 0 }, $class
 }
 
-sub id {
-    my $self = shift;
-    $$self;
+sub id
+{
+  my $self = shift;
+  $self->{_id};
 }
 
-sub stat {
-    my $self = shift;
-    my $data = "";
-    msgctl($$self,IPC_STAT,$data) or
-	return undef;
-    IPC::Msg::stat->new->unpack($data);
+sub addr
+{
+  my $self = shift;
+  $self->{_addr};
 }
 
-sub set {
-    my $self = shift;
-    my $ds;
-
-    if(@_ == 1) {
-	$ds = shift;
-    }
-    else {
-	croak 'Bad arg count' if @_ % 2;
-	my %arg = @_;
-	$ds = $self->stat
-		or return undef;
-	my($key,$val);
-	$ds->$key($val)
-	    while(($key,$val) = each %arg);
-    }
-
-    msgctl($$self,IPC_SET,$ds->pack);
+sub stat
+{
+  my $self = shift;
+  my $data = '';
+  shmctl $self->id, IPC_STAT, $data or return undef;
+  IPC::SharedMem::stat->new->unpack($data);
 }
 
-sub remove {
-    my $self = shift;
-    (msgctl($$self,IPC_RMID,0), undef $$self)[0];
+sub attach
+{
+  @_ >= 1 && @_ <= 2 or croak '$shm->attach([FLAG])';
+  my($self, $flag) = @_;
+  defined $self->addr and return undef;
+  $self->{_addr} = shmat($self->id, undef, $flag || 0);
+  defined $self->addr;
 }
 
-sub rcv {
-    @_ <= 5 && @_ >= 3 or croak '$msg->rcv( BUF, LEN, TYPE, FLAGS )';
-    my $self = shift;
-    my $buf = "";
-    msgrcv($$self,$buf,$_[1],$_[2] || 0, $_[3] || 0) or
-	return;
-    my $type;
-    ($type,$_[0]) = unpack("l$N a*",$buf);
-    $type;
+sub detach
+{
+  my $self = shift;
+  defined $self->addr or return undef;
+  defined shmdt($self->addr);
 }
 
-sub snd {
-    @_ <= 4 && @_ >= 3 or  croak '$msg->snd( TYPE, BUF, FLAGS )';
-    my $self = shift;
-    msgsnd($$self,pack("l$N a*",$_[0],$_[1]), $_[2] || 0);
+sub remove
+{
+  my $self = shift;
+  return undef if $self->is_removed;
+  my $rv = shmctl $self->id, IPC_RMID, 0;
+  $self->{_isrm} = 1 if $rv;
+  return $rv;
 }
 
+sub is_removed
+{
+  my $self = shift;
+  $self->{_isrm};
+}
+
+sub read
+{
+  @_ == 3 or croak '$shm->read(POS, SIZE)';
+  my($self, $pos, $size) = @_;
+  my $buf = '';
+  if (defined $self->addr) {
+    memread($self->addr, $buf, $pos, $size) or return undef;
+  }
+  else {
+    shmread($self->id, $buf, $pos, $size) or return undef;
+  }
+  $buf;
+}
+
+sub write
+{
+  @_ == 4 or croak '$shm->write(STRING, POS, SIZE)';
+  my($self, $str, $pos, $size) = @_;
+  if (defined $self->addr) {
+    return memwrite($self->addr, $str, $pos, $size);
+  }
+  else {
+    return shmwrite($self->id, $str, $pos, $size);
+  }
+}
 
 1;
 
@@ -121,12 +141,12 @@ __END__
 
 =head1 NAME
 
-IPC::Msg - SysV Msg IPC object class
+IPC::SharedMem - SysV Shared Memory IPC object class
 
 =head1 SYNOPSIS
 
     use IPC::SysV qw(IPC_PRIVATE S_IRUSR S_IWUSR);
-    use IPC::Msg;
+    use IPC::SharedMem;
 
     $msg = new IPC::Msg(IPC_PRIVATE, S_IRUSR | S_IWUSR);
 
@@ -180,22 +200,7 @@ See L<msgrcv>.  The  BUF becomes tainted.
 
 =item remove
 
-Remove and destroy the message queue from the system.
-
-=item set ( STAT )
-
-=item set ( NAME => VALUE [, NAME => VALUE ...] )
-
-C<set> will set the following values of the C<stat> structure associated
-with the message queue.
-
-    uid
-    gid
-    mode (oly the permission bits)
-    qbytes
-
-C<set> accepts either a stat object, as returned by the C<stat> method,
-or a list of I<name>-I<value> pairs.
+Remove the shared memory from the system or mark it as removed.
 
 =item snd ( TYPE, MSG [, FLAGS ] )
 
@@ -204,8 +209,8 @@ See L<msgsnd>.
 
 =item stat
 
-Returns an object of type C<IPC::Msg::stat> which is a sub-class of
-C<Class::Struct>. It provides the following fields. For a description
+Returns an object of type C<IPC::SharedMem::stat> which is a sub-class
+of C<Class::Struct>. It provides the following fields. For a description
 of these fields see you system documentation.
 
     uid
@@ -213,12 +218,12 @@ of these fields see you system documentation.
     cuid
     cgid
     mode
-    qnum
-    qbytes
-    lspid
-    lrpid
-    stime
-    rtime
+    segsz
+    lpid
+    cpid
+    nattach
+    atime
+    dtime
     ctime
 
 =back
