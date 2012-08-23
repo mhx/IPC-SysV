@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 12 $
+#  $Revision: 13 $
 #  $Author: mhx $
-#  $Date: 2007/10/14 04:14:52 +0100 $
+#  $Date: 2007/10/19 19:46:34 +0100 $
 #
 ################################################################################
 #
@@ -53,9 +53,8 @@ my $nsem = 5;
 my $sem = IPC::Semaphore->new(IPC_PRIVATE, $nsem, S_IRWXU | S_IRWXG | S_IRWXO | IPC_CREAT);
 
 unless (defined $sem) {
-  my $err = $!;
-  my $info = "IPC::Semaphore->new failed: $err";
-  if ($err == &IPC::SysV::ENOSPC) {
+  my $info = "IPC::Semaphore->new failed: $!";
+  if ($! == &IPC::SysV::ENOSPC || $! == &IPC::SysV::ENOSYS) {
     plan(skip_all => $info);
   }
   else {

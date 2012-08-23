@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 10 $
+#  $Revision: 11 $
 #  $Author: mhx $
-#  $Date: 2007/10/14 04:14:30 +0100 $
+#  $Date: 2007/10/19 19:46:34 +0100 $
 #
 ################################################################################
 #
@@ -43,19 +43,20 @@ plan(tests => 38);
 use IPC::SysV qw(IPC_PRIVATE IPC_NOWAIT IPC_STAT IPC_RMID S_IRWXU);
 use strict;
 
-my $msg;
-my $sem;
+{
+  my $did_diag = 0;
 
-# FreeBSD is known to throw this if there's no SysV IPC in the kernel.
-if (exists $SIG{SYS}) {  # No SIGSYS with older perls...
-  $SIG{SYS} = sub {
+  sub do_sys_diag
+  {
+    return if $did_diag++;
+
     diag(<<EOM);
-SIGSYS caught.
+
 It may be that your kernel does not have SysV IPC configured.
 
 EOM
-    if ($^O eq 'freebsd') {
-      diag(<<EOM);
+
+    diag(<<EOM) if $^O eq 'freebsd';
 You must have following options in your kernel:
 
 options         SYSVSHM
@@ -65,11 +66,30 @@ options         SYSVMSG
 See config(8).
 
 EOM
-    }
+  }
+}
+
+sub skip_or_die
+{
+  my($what, $why) = @_;
+  my $info = "$what failed: $why";
+  if ($why == &IPC::SysV::ENOSPC || $why == &IPC::SysV::ENOSYS) {
+    do_sys_diag() if $why == &IPC::SysV::ENOSYS;
+    return $info;
+  }
+  die $info;
+}
+
+# FreeBSD is known to throw this if there's no SysV IPC in the kernel.
+if (exists $SIG{SYS}) {  # No SIGSYS with older perls...
+  $SIG{SYS} = sub {
+    do_sys_diag();
     diag('Bail out! SIGSYS caught');
     exit(1);
   };
 }
+
+my $msg;
 
 my $perm = S_IRWXU;
 my $test_name;
@@ -86,14 +106,7 @@ SKIP: {
 
   # Very first time called after machine is booted value may be 0 
   unless (defined $msg && $msg >= 0) {
-    my $err = $!;
-    my $info = "msgget failed: $err";
-    if ($err == &IPC::SysV::ENOSPC) {
-      skip($info, 6);
-    }
-    else {
-      die $info;
-    }
+    skip(skip_or_die('msgget', $!), 6);
   }
 
   pass('msgget IPC_PRIVATE S_IRWXU');
@@ -172,6 +185,8 @@ EOM
   }
 }
 
+my $sem;
+
 SKIP: {
   skip('lacking d_semget d_semctl', 11) unless
       $Config{'d_semget'} eq 'define' &&
@@ -186,14 +201,7 @@ SKIP: {
 
   # Very first time called after machine is booted value may be 0 
   unless (defined $sem && $sem >= 0) {
-    my $err = $!;
-    my $info = "semget failed: $err";
-    if ($err == &IPC::SysV::ENOSPC) {
-      skip($info, 11);
-    }
-    else {
-      die $info;
-    }
+    skip(skip_or_die('semget', $!), 11);
   }
 
   pass('sem acquire');
@@ -241,14 +249,7 @@ SKIP: {
 
   # Very first time called after machine is booted value may be 0 
   unless (defined $shm && $shm >= 0) {
-    my $err = $!;
-    my $info = "shmget failed: $err";
-    if ($err == &IPC::SysV::ENOSPC) {
-      skip($info, 10);
-    }
-    else {
-      die $info;
-    }
+    skip(skip_or_die('shmget', $!), 10);
   }
 
   pass("shm acquire");

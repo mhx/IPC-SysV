@@ -1,3 +1,9 @@
+1.99_06 - 2007-10-19
+
+    * handle systems built without SysV IPC support by checking
+      for ENOSYS and skipping the tests (and give a diagnostic
+      message)
+
 1.99_05 - 2007-10-18
 
     * make sure we can build even without ExtUtils::Constant

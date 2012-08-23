@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 2 $
+#  $Revision: 3 $
 #  $Author: mhx $
-#  $Date: 2007/10/13 16:17:39 +0100 $
+#  $Date: 2007/10/19 19:46:34 +0100 $
 #
 ################################################################################
 #
@@ -38,9 +38,8 @@ use IPC::SharedMem;
 my $shm = IPC::SharedMem->new(IPC_PRIVATE, 8, S_IRWXU);
 
 unless (defined $shm) {
-  my $err = $!;
-  my $info = "IPC::SharedMem->new failed: $err";
-  if ($err == &IPC::SysV::ENOSPC) {
+  my $info = "IPC::SharedMem->new failed: $!";
+  if ($! == &IPC::SysV::ENOSPC || $! == &IPC::SysV::ENOSYS) {
     plan(skip_all => $info);
   }
   else {

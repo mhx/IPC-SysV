@@ -1,8 +1,8 @@
 ################################################################################
 #
-#  $Revision: 8 $
+#  $Revision: 9 $
 #  $Author: mhx $
-#  $Date: 2007/10/13 04:14:11 +0100 $
+#  $Date: 2007/10/19 19:46:34 +0100 $
 #
 ################################################################################
 #
@@ -43,9 +43,8 @@ use IPC::Msg;
 my $msq = new IPC::Msg(IPC_PRIVATE, S_IRWXU | S_IRWXG | S_IRWXO);
 
 unless (defined $msq) {
-  my $err = $!;
-  my $info = "IPC::Msg->new failed: $err";
-  if ($err == &IPC::SysV::ENOSPC) {
+  my $info = "IPC::Msg->new failed: $!";
+  if ($! == &IPC::SysV::ENOSPC || $! == &IPC::SysV::ENOSYS) {
     plan(skip_all => $info);
   }
   else {
