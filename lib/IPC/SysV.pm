@@ -66,6 +66,10 @@ $VERSION = eval $VERSION;
 
 ));
 
+%EXPORT_TAGS = (
+  all => [@EXPORT, @EXPORT_OK],
+);
+
 sub AUTOLOAD
 {
   my $constname = $AUTOLOAD;
