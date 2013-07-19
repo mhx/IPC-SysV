@@ -113,7 +113,7 @@ C<IPC::SysV> defines and conditionally exports all the constants
 defined in your system include files which are needed by the SysV
 IPC calls.  Common ones include
 
-  IPC_CREATE IPC_EXCL IPC_NOWAIT IPC_PRIVATE IPC_RMID IPC_SET IPC_STAT
+  IPC_CREAT IPC_EXCL IPC_NOWAIT IPC_PRIVATE IPC_RMID IPC_SET IPC_STAT
   GETVAL SETVAL GETPID GETNCNT GETZCNT GETALL SETALL
   SEM_A SEM_R SEM_UNDO
   SHM_RDONLY SHM_RND SHMLBA
