@@ -57,7 +57,12 @@ sub configure
   }
   else {
     # IPC::SysV is in the core since 5.005
-    push @moreopts, INSTALLDIRS => ($] >= 5.005 ? 'perl' : 'site');
+    # 5.11.0+ has site before perl
+    push @moreopts, INSTALLDIRS => (
+      ($] >= 5.005 and $] < 5.011)
+        ? 'perl'
+        : 'site'
+    );
   }
 
   $depend{'SysV.xs'} = 'const-c.inc const-xs.inc';
