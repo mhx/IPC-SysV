@@ -172,8 +172,8 @@ A class providing an object based interface to SysV IPC shared memory.
 
 =item new ( KEY , SIZE , FLAGS )
 
-Creates a new shared memory segment associated with C<KEY>. A new
-segment is created if
+Creates a new shared memory segment of C<SIZE> bytes size associated
+with C<KEY>. A new segment is created if
 
 =over 4
 
