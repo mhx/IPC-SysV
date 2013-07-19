@@ -5,6 +5,8 @@ cover_db/
 inc/
 Build
 Build.bat
+const-c.inc
+const-xs.inc
 .last_cover_stats
 Makefile
 Makefile.old
