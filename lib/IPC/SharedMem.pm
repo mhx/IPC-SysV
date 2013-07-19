@@ -232,7 +232,7 @@ of these fields see you system documentation.
     segsz
     lpid
     cpid
-    nattach
+    nattch
     atime
     dtime
     ctime
