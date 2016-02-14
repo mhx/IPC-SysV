@@ -12,6 +12,10 @@ Makefile
 Makefile.old
 MANIFEST.bak
 META.yml
+MYMETA.json
 MYMETA.yml
 nytprof.out
 pm_to_blib
+SysV.c
+*.bs
+*.o
