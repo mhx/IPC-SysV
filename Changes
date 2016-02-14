@@ -1,3 +1,10 @@
+2.05 - 2016-02-14
+
+    * CPAN #105416: Coverity finding: Argument cannot be negative
+      (thanks to Jarkko Hietaniemi for providing a patch)
+    * CPAN #102300: Links to manpages incorrect
+    * GitHub #1: Use of uninitialized value in list slice
+
 2.04 - 2013-07-20
 
     * CPAN #72458: Add 'all' export
