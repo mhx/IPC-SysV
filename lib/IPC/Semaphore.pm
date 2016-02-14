@@ -56,7 +56,9 @@ sub id {
 
 sub remove {
     my $self = shift;
-    (semctl($$self,0,IPC_RMID,0), undef $$self)[0];
+    my $result = semctl($$self,0,IPC_RMID,0);
+    undef $$self;
+    $result;
 }
 
 sub getncnt {
