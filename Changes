@@ -1,3 +1,8 @@
+2.07 - 2016-05-09
+
+    * CPAN #112827: incorrect skip count in t/ipcsysv.t
+      (thanks to Tony Cook for providing a patch)
+
 2.06 - 2016-02-28
 
     * CPAN #112110: invalid shmid should set errno
