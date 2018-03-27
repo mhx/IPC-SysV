@@ -12,9 +12,11 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#define NEED_sv_2pv_flags
-#define NEED_sv_pvn_force_flags
-#include "ppport.h"
+#ifndef NO_PPPORT_H
+#  define NEED_sv_2pv_flags
+#  define NEED_sv_pvn_force_flags
+#  include "ppport.h"
+#endif
 
 #include <sys/types.h>
 
