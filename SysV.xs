@@ -348,8 +348,8 @@ void
 memread(addr, sv, pos, size)
     SV *addr
     SV *sv
-    int pos
-    int size
+    UV pos
+    UV size
   CODE:
     char *caddr = (char *) sv2addr(addr);
     char *dst;
@@ -373,8 +373,8 @@ void
 memwrite(addr, sv, pos, size)
     SV *addr
     SV *sv
-    int pos
-    int size
+    UV pos
+    UV size
   CODE:
     char *caddr = (char *) sv2addr(addr);
     STRLEN len;
