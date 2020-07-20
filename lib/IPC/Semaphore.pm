@@ -39,7 +39,7 @@ my $N = do { my $foo = eval { pack "L!", 0 }; $@ ? '' : '!' };
 }
 
 sub new {
-    @_ == 4 || croak 'new ' . __PACKAGE__ . '( KEY, NSEMS, FLAGS )';
+    @_ == 4 || croak __PACKAGE__ . '->new( KEY, NSEMS, FLAGS )';
     my $class = shift;
 
     my $id = semget($_[0],$_[1],$_[2]);
