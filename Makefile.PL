@@ -62,6 +62,26 @@ sub configure
 
   $depend{'SysV.xs'} = 'const-c.inc const-xs.inc';
 
+  if (eval $ExtUtils::MakeMaker::VERSION >= 6.46) {
+    print "Setting metadata...\n";
+    push @moreopts,
+      META_MERGE    => {
+        'meta-spec' => {
+          version => 2,
+        },
+        resources => {
+          bugtracker => {
+            web => 'https://github.com/mhx/IPC-SysV/issues/',
+          },
+          repository => {
+            type => 'git',
+            url  => 'git://github.com/mhx/IPC-SysV.git',
+            web  => 'https://github.com/mhx/IPC-SysV/',
+          },
+        },
+      };
+  }
+
   return {
     depend => \%depend,
     @moreopts
